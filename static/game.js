@@ -33,32 +33,67 @@ class Player {
             ctx.fillRect(pos.x - cameraX, pos.y, this.width, this.height);
         });
 
-        // Свечение кубика
+        // Свечение
         ctx.shadowBlur = 15;
         ctx.shadowColor = this.color;
-
-        // Тело
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x - cameraX, this.y, this.width, this.height);
 
-        // Лицо
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#0d0221'; // Темный цвет фона для глаз
+        if (selectedCharacter === 'cube') {
+            // Тело
+            ctx.fillRect(this.x - cameraX, this.y, this.width, this.height);
 
-        // Глаза
-        ctx.beginPath();
-        ctx.arc(this.x - cameraX + 12, this.y + 12, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(this.x - cameraX + 28, this.y + 12, 4, 0, Math.PI * 2);
-        ctx.fill();
+            // Лицо
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#0d0221'; // Темный цвет фона для глаз
 
-        // Рот (улыбка)
-        ctx.strokeStyle = '#0d0221';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(this.x - cameraX + 20, this.y + 25, 8, 0, Math.PI);
-        ctx.stroke();
+            // Глаза
+            ctx.beginPath();
+            ctx.arc(this.x - cameraX + 12, this.y + 12, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(this.x - cameraX + 28, this.y + 12, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Рот (улыбка)
+            ctx.strokeStyle = '#0d0221';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(this.x - cameraX + 20, this.y + 25, 8, 0, Math.PI);
+            ctx.stroke();
+        } else if (selectedCharacter === 'human') {
+            // Рисуем человека (неоновый стикман)
+            ctx.beginPath();
+            ctx.arc(this.x - cameraX + this.width/2, this.y + 10, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Тело
+            ctx.fillRect(this.x - cameraX + this.width/2 - 2, this.y + 18, 4, 15);
+
+            // Руки
+            ctx.fillRect(this.x - cameraX + 5, this.y + 20, 30, 3);
+
+            // Ноги
+            ctx.fillRect(this.x - cameraX + 12, this.y + 33, 4, 15);
+            ctx.fillRect(this.x - cameraX + 24, this.y + 33, 4, 15);
+        } else if (selectedCharacter === 'dog') {
+            // Рисуем собаку
+            // Тело
+            ctx.fillRect(this.x - cameraX + 5, this.y + 20, 25, 12);
+
+            // Голова
+            ctx.fillRect(this.x - cameraX + 25, this.y + 10, 12, 12);
+
+            // Уши
+            ctx.fillRect(this.x - cameraX + 25, this.y + 5, 4, 5);
+            ctx.fillRect(this.x - cameraX + 33, this.y + 5, 4, 5);
+
+            // Ноги
+            ctx.fillRect(this.x - cameraX + 8, this.y + 32, 4, 8);
+            ctx.fillRect(this.x - cameraX + 23, this.y + 32, 4, 8);
+
+            // Хвост
+            ctx.fillRect(this.x - cameraX + 2, this.y + 15, 3, 8);
+        }
     }
 }
 
@@ -118,6 +153,7 @@ let messageTimer = 0;
 
 // Game State Management
 const STATE_MAIN_MENU = 'MAIN_MENU';
+const STATE_CHAR_SELECT = 'CHAR_SELECT';
 const STATE_LEVEL_SELECT = 'LEVEL_SELECT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
 const STATE_PLAYING = 'PLAYING';
@@ -129,16 +165,43 @@ let countdownTimer = 0;
 
 // UI Elements
 const uiMainMenu = document.getElementById('main-menu');
+const uiCharMenu = document.getElementById('character-menu');
 const uiLevelMenu = document.getElementById('level-menu');
 const uiCountdown = document.getElementById('countdown-overlay');
 const uiCountdownText = document.getElementById('countdown-text');
 const uiWinOverlay = document.getElementById('win-overlay');
 
+const btnCharacters = document.getElementById('btn-characters');
+const btnCharCube = document.getElementById('btn-char-cube');
+const btnCharHuman = document.getElementById('btn-char-human');
+const btnCharDog = document.getElementById('btn-char-dog');
+
 const btnLevels = document.getElementById('btn-levels');
 const btnLvl1 = document.getElementById('btn-lvl-1');
 const btnContinue = document.getElementById('btn-continue');
 
+let selectedCharacter = 'cube';
+
 // UI Event Listeners
+if (btnCharacters) {
+    btnCharacters.addEventListener('click', () => {
+        uiMainMenu.classList.add('hidden');
+        uiCharMenu.classList.remove('hidden');
+        gameState = STATE_CHAR_SELECT;
+    });
+}
+
+function selectCharacter(charType) {
+    selectedCharacter = charType;
+    uiCharMenu.classList.add('hidden');
+    uiMainMenu.classList.remove('hidden');
+    gameState = STATE_MAIN_MENU;
+}
+
+if (btnCharCube) btnCharCube.addEventListener('click', () => selectCharacter('cube'));
+if (btnCharHuman) btnCharHuman.addEventListener('click', () => selectCharacter('human'));
+if (btnCharDog) btnCharDog.addEventListener('click', () => selectCharacter('dog'));
+
 if (btnLevels) {
     btnLevels.addEventListener('click', () => {
         uiMainMenu.classList.add('hidden');
